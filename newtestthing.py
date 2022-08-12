@@ -12,17 +12,13 @@ class Asteroid():
     def __init__(self, asteroidX, asteroidY):
         self.asteroidX = asteroidX
         self.asteroidY = asteroidY
+        self.direction = "left"
         
     def display(self):    
         screen.blit((Asteroid.asteroidImg), (self.asteroidX, self.asteroidY))
     
     def move(self):
         pass
-    
-    
-
- 
-
 
 
 
@@ -52,34 +48,33 @@ while running:
     screen.fill((255,0,0))
     
 
-    #xchange = 1
+    
     for i in asteroids:
+        
+        if i.asteroidX < 0:
+            i.direction = "right"
+        elif i.asteroidX > 300:
+            i.direction = "left"
+        
         xchange = 1
-        if i.asteroidX < 150:
+        if i.direction == "right":
             xchange = 1
             i.asteroidX += xchange
             i.display()
             print(i.asteroidX)
-        elif i.asteroidX > 150:
+
+        if i.direction == "left":
             xchange = -1
             i.asteroidX += xchange
             i.display()
-       
+            print(i.asteroidX)
 
-    # enemyX += enemyX_change
-
-    # if enemyX <= 0:
-    #     enemyX_change = 0.3
-        
-    # elif enemyX >= 736:
-    #     enemyX_change = -0.5
+   
         
         Asteroid.display(i)
 
 
-    #     print("moving", asteroid.asteroidX, ax)
-        #ax = asteroid.asteroidX + asteroid.asteroidX
-        
+
     
     
 
