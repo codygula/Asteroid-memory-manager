@@ -53,7 +53,8 @@ while running:
 
     # Background color
     screen.fill((255,0,0))
-    
+    changes = [1.1 , 1.3, 1.5]
+    negChanges = [-1.35 , -1.55, -1.7]
 
     
     for i in asteroids:
@@ -70,25 +71,25 @@ while running:
         
         
         if i.direction == "right":
-            xchange = (round((random.randint(5,10)/10), 2))
+            xchange = random.choice(changes)
             i.asteroidX += xchange
             i.display()
             print(i.asteroidX)
 
         if i.direction == "left":
-            xchange = -1
+            xchange = random.choice(negChanges)
             i.asteroidX += xchange 
             i.display()
             print(i.asteroidX)
         
         if i.Ydirection == "up":
-            ychange = (round((random.randint(5,10)/10), 2))
+            ychange = random.choice(changes)
             i.asteroidY += ychange
             i.display()
             print(i.asteroidX)
 
         if i.Ydirection == "down":
-            ychange = -1
+            ychange = random.choice(negChanges)
             i.asteroidY += ychange 
             i.display()
             print(i.asteroidX)
