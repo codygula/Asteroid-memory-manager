@@ -9,13 +9,20 @@ screen = pygame.display.set_mode((800,600))
 
 class Asteroid():
     asteroidImg = pygame.image.load("asteroid.png")
-    def __init__(self, asteroidX, asteroidY):
+    def __init__(self, asteroidX, asteroidY, name):
         self.asteroidX = asteroidX
         self.asteroidY = asteroidY
         self.direction = "left"
+        self.Ydirection = "up"
+        self.randomNumber = round((random.randint(1,10)/50), 2)
+        self.name = name
+        self.speed = "speed here"
+        self.size = "size here"
+
         
     def display(self):    
         screen.blit((Asteroid.asteroidImg), (self.asteroidX, self.asteroidY))
+        #self.name = name
     
     def move(self):
         pass
@@ -28,15 +35,15 @@ ax = 100
 startX = random.randint(5,790)
 startY = random.randint(5, 590)
 
-def create():
+def create(name):
         ax = random.randint(5,790)
         ay = random.randint(5, 590)
-        asteroids.append(Asteroid(ax,ay))
+        asteroids.append(Asteroid(ax,ay, name))
 
-list1 = ["item1", "item2", "item3", "item4"]
+list1 = ["item1", "item2", "item3", "item4","item1", "item2", "item3", "item4"]
 asteroids = []
 for i in list1:
-    i = create()
+    i = create(i)
 
 
     
@@ -53,19 +60,36 @@ while running:
         
         if i.asteroidX < 0:
             i.direction = "right"
-        elif i.asteroidX > 300:
+        elif i.asteroidX > 800:
             i.direction = "left"
+
+        if i.asteroidY < 0:
+            i.Ydirection = "up"
+        elif i.asteroidY > 500:
+            i.Ydirection = "down"
         
-        xchange = 1
+        
         if i.direction == "right":
-            xchange = 1
+            xchange = (round((random.randint(5,10)/10), 2))
             i.asteroidX += xchange
             i.display()
             print(i.asteroidX)
 
         if i.direction == "left":
             xchange = -1
-            i.asteroidX += xchange
+            i.asteroidX += xchange 
+            i.display()
+            print(i.asteroidX)
+        
+        if i.Ydirection == "up":
+            ychange = (round((random.randint(5,10)/10), 2))
+            i.asteroidY += ychange
+            i.display()
+            print(i.asteroidX)
+
+        if i.Ydirection == "down":
+            ychange = -1
+            i.asteroidY += ychange 
             i.display()
             print(i.asteroidX)
 
