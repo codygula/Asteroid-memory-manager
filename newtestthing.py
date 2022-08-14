@@ -5,8 +5,11 @@ import psutil
 import os
 
 pygame.init()
+screenX = 800
+screenY = 600
 
-screen = pygame.display.set_mode((800,600))
+screen = pygame.display.set_mode((screenX,screenY))
+clock = pygame.time.Clock()
 
 white = (255, 255, 255)
 green = (0, 255, 0)
@@ -70,54 +73,8 @@ class Asteroid():
         pass
 
 
+explosion = [pygame.image.load('numbers/one.png'), pygame.image.load('numbers/two.png'), pygame.image.load('numbers/three.png'), pygame.image.load('numbers/four.png'), pygame.image.load('numbers/five.png'), pygame.image.load('numbers/six.png')]
 
-#######
-# https://www.techwithtim.net/tutorials/game-development-with-python/pygame-tutorial/pygame-animation/
-explosion_anim = []
-
-for i in range(9):
-    filename = 'regularExplosion0{}.png'.format(i)
-    img = pygame.image.load(os.path.join("explosions", filename)).convert()
-    #img = pygame.image.load("explosions".join("explosions")).convert()
-    img.set_colorkey(black)
-    img_lg = pygame.transform.scale(img, (75, 75))
-    explosion_anim.append(img_lg)
-
-def explode(x,y):
-    # for i in range(9):
-    #     filename = 'regularExplosion0{}.png'.format(i)
-    #     img = pygame.image.load(os.path.join("explosions", filename)).convert()
-    #     img.set_colorkey(black)
-    #     img_lg = pygame.transform.scale(img, (75, 75))
-    #     explosion_anim.append(img_lg)
-    screen.blit(explosion_anim[0], x, y)
-
-    
-
-class Explosion(pygame.sprite.Sprite):
-    def __init__(self): #, center, size):
-        pygame.sprite.Sprite.__init__(self)
-        #self.size = size
-        self.image = explosion_anim[self.size][0]
-        self.rect = self.image.get_rect()
-        #self.rect.center = center
-        self.frame = 0
-        self.last_update = pygame.time.get_ticks()
-        self.frame_rate = 50
-
-    def update(self):
-        now = pygame.time.get_ticks()
-        if now - self.last_update > self.frame_rate:
-            self.last_update = now
-            self.frame += 1
-            if self.frame == len(explosion_anim[self.size]):
-                self.kill()
-            else:
-                center = self.rect.center
-                self.image = explosion_anim[self.size][self.frame]
-                self.rect = self.image.get_rect()
-                self.rect.center = center
-#########
 running = True
 ax = 100
 
@@ -129,19 +86,82 @@ def create(name, size):
         ay = random.randint(5, 590)
         asteroids.append(Asteroid(ax,ay, name, size))
 
-list1 = ["item1", "item2", "item3", "item4","item1", "item2", "item3", "item4"]
-sizes = [(64,64),(64,64),(64,64),(64,64),(64,64),(64,64),(32,32),(32,32)]
+########################################
+# setup asteroids with current running processes
+# list1 = ["item1", "item2", "item3", "item4","item1", "item2", "item3", "item4"]
+# sizes = [(64,64),(64,64),(64,64),(64,64),(64,64),(64,64),(32,32),(32,32)]
+list1 = []
+sizes = []
 speed = []
 asteroids = []
+
+
+
+def getListOfProcessSortedByMemory():
+    '''
+    Get list of running process sorted by Memory Usage
+    '''
+    listOfProcObjects = []
+    # Iterate over the list
+    for proc in psutil.process_iter():
+       try:
+           # Fetch process details as dict
+           pinfo = proc.as_dict(attrs=['pid', 'name', 'username'])
+           pinfo['vms'] = proc.memory_info().vms / (1024 * 1024)
+           # Append dict to list
+           listOfProcObjects.append(pinfo);
+       except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+           pass
+    # Sort list of dict by key vms i.e. memory usage
+    listOfProcObjects = sorted(listOfProcObjects, key=lambda procObj: procObj['vms'], reverse=True)
+    return listOfProcObjects
+
+# listOfRunningProcess = getListOfProcessSortedByMemory()
+# for elem in listOfRunningProcess: #[:5] :
+#     print(elem['name'])
+#     list1.append(elem['name'])
+#     print(elem['pid'])
+#     print(elem['vms'])
+
+def processSize(vms):
+    return vms / screenX
+
+
+listOfRunningProcess = getListOfProcessSortedByMemory()
+adjustedSizes = []
+#sizes = []
+numberOfAsteroids = 20
+for elem in listOfRunningProcess[:numberOfAsteroids] :
+    print(elem['name'])
+    
+    #print(elem['pid'])
+    adjustedSizes.append(processSize(elem['vms']))
+    list1.append(elem['name'])
+
+difference = max(adjustedSizes) - min(adjustedSizes)
+print(difference)
+for i in adjustedSizes:
+    j = (i / difference) * 100
+    sizes.append([j,j])
+print(sizes)
+print(adjustedSizes)
+
+
+
+# list1 = ["item1", "item2", "item3", "item4","item1", "item2", "item3", "item4"]
+# sizes = [(64,64),(64,64),(64,64),(64,64),(64,64),(64,64),(32,32),(32,32)]
+# speed = []
+# asteroids = []
 #for i in list1:
 i = 0
 while i <= len(list1)-1:
-    create(list1[i], sizes[i])
+    create(list1[i], (32,32)) #sizes[i])
     i += 1
 
 
 
 while running:
+    clock.tick(30)
 
     # Background color
     screen.fill((255,0,0))
@@ -168,11 +188,15 @@ while running:
 
     
     for i in asteroids:
-        # isCollision(enemyX, enemyY, bulletX, bulletY)
+        
         if isCollision(i.asteroidX, i.asteroidY, bulletX, bulletY) == True:
             print("Collision", i.name)
-            explode(i.asteroidX, i.asteroidY)
-            #expl = Explosion # (hit.rect.center, 'lg')
+
+            # slowed mode explode code
+            j=0
+            while j <= len(explosion)-1:
+                screen.blit(explosion[j], (i.asteroidX, i.asteroidY))
+                j += 1
             asteroids.remove(i)
 
         if i.asteroidX < 0:
