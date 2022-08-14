@@ -8,14 +8,13 @@ pygame.init()
 screenX = 800
 screenY = 600
 
-screen = pygame.display.set_mode((screenX,screenY))
-clock = pygame.time.Clock()
-
 white = (255, 255, 255)
 green = (0, 255, 0)
 blue = (0, 0, 128)
 black = (0,0,0)
 
+screen = pygame.display.set_mode((screenX,screenY))
+clock = pygame.time.Clock()
 
 
 playerImg = pygame.image.load("space-invaders.png")
@@ -75,8 +74,8 @@ class Asteroid():
 
 explosion = [pygame.image.load('numbers/one.png'), pygame.image.load('numbers/two.png'), pygame.image.load('numbers/three.png'), pygame.image.load('numbers/four.png'), pygame.image.load('numbers/five.png'), pygame.image.load('numbers/six.png')]
 
-running = True
-ax = 100
+#running = True
+#ax = 100
 
 startX = random.randint(5,790)
 startY = random.randint(5, 590)
@@ -122,7 +121,7 @@ listOfRunningProcess = getListOfProcessSortedByMemory()
 adjustedSizes = []
 #sizes = []
 numberOfAsteroids = 20
-for elem in listOfRunningProcess[:numberOfAsteroids] :
+for elem in listOfRunningProcess[:numberOfAsteroids]:
     print(elem['name'])
     
     #print(elem['pid'])
@@ -131,6 +130,8 @@ for elem in listOfRunningProcess[:numberOfAsteroids] :
 
 difference = max(adjustedSizes) - min(adjustedSizes)
 print(difference)
+
+# Thing to determine size of asteroids. This needs work
 for i in adjustedSizes:
     j = math.log2(i) *  screenX /100#/ difference
     
@@ -145,6 +146,7 @@ while i <= len(list1)-1:
 
 
 # Main loop
+running = True
 while running:
     clock.tick(30)
 
