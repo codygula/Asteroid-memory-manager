@@ -74,8 +74,6 @@ class Asteroid():
 
 explosion = [pygame.image.load('numbers/one.png'), pygame.image.load('numbers/two.png'), pygame.image.load('numbers/three.png'), pygame.image.load('numbers/four.png'), pygame.image.load('numbers/five.png'), pygame.image.load('numbers/six.png')]
 
-#running = True
-#ax = 100
 
 startX = random.randint(5,790)
 startY = random.randint(5, 590)
@@ -201,27 +199,25 @@ while running:
             xchange = random.choice(changes)
             i.asteroidX += xchange
             i.display()
-            #print(i.asteroidX)
+            
 
         if i.direction == "left":
             xchange = random.choice(negChanges)
             i.asteroidX += xchange 
             i.display()
-            #print(i.asteroidX)
+            
         
         if i.Ydirection == "up":
             ychange = random.choice(changes)
             i.asteroidY += ychange
             i.display()
-            #print(i.asteroidX)
+           
 
         if i.Ydirection == "down":
             ychange = random.choice(negChanges)
             i.asteroidY += ychange 
             i.display()
-            #print(i.asteroidX)
-
-   
+            
       
         Asteroid.display(i)
 
