@@ -88,8 +88,7 @@ def create(name, size):
 
 ########################################
 # setup asteroids with current running processes
-# list1 = ["item1", "item2", "item3", "item4","item1", "item2", "item3", "item4"]
-# sizes = [(64,64),(64,64),(64,64),(64,64),(64,64),(64,64),(32,32),(32,32)]
+
 list1 = []
 sizes = []
 speed = []
@@ -98,9 +97,7 @@ asteroids = []
 
 
 def getListOfProcessSortedByMemory():
-    '''
-    Get list of running process sorted by Memory Usage
-    '''
+    #Get list of running processes by memory
     listOfProcObjects = []
     # Iterate over the list
     for proc in psutil.process_iter():
@@ -116,17 +113,11 @@ def getListOfProcessSortedByMemory():
     listOfProcObjects = sorted(listOfProcObjects, key=lambda procObj: procObj['vms'], reverse=True)
     return listOfProcObjects
 
-# listOfRunningProcess = getListOfProcessSortedByMemory()
-# for elem in listOfRunningProcess: #[:5] :
-#     print(elem['name'])
-#     list1.append(elem['name'])
-#     print(elem['pid'])
-#     print(elem['vms'])
 
 def processSize(vms):
     return vms / screenX
 
-
+## Code to create lists of runniung proccesses, thier sizes, and PIDs
 listOfRunningProcess = getListOfProcessSortedByMemory()
 adjustedSizes = []
 #sizes = []
@@ -141,25 +132,19 @@ for elem in listOfRunningProcess[:numberOfAsteroids] :
 difference = max(adjustedSizes) - min(adjustedSizes)
 print(difference)
 for i in adjustedSizes:
-    j = (i / difference) * 100
+    j = math.log2(i) *  screenX /100#/ difference
+    
     sizes.append([j,j])
 print(sizes)
 print(adjustedSizes)
 
-
-
-# list1 = ["item1", "item2", "item3", "item4","item1", "item2", "item3", "item4"]
-# sizes = [(64,64),(64,64),(64,64),(64,64),(64,64),(64,64),(32,32),(32,32)]
-# speed = []
-# asteroids = []
-#for i in list1:
 i = 0
 while i <= len(list1)-1:
-    create(list1[i], (32,32)) #sizes[i])
+    create(list1[i], sizes[i])
     i += 1
 
 
-
+# Main loop
 while running:
     clock.tick(30)
 
