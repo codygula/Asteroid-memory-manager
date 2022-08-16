@@ -4,15 +4,8 @@ import math
 import psutil
 import os
 
-screenX = 800
-screenY = 600
-
-
-
 def getListOfProcessSortedByMemory():
-    '''
-    Get list of running process sorted by Memory Usage
-    '''
+    #Get list of running processes by memory
     listOfProcObjects = []
     # Iterate over the list
     for proc in psutil.process_iter():
@@ -27,28 +20,49 @@ def getListOfProcessSortedByMemory():
     # Sort list of dict by key vms i.e. memory usage
     listOfProcObjects = sorted(listOfProcObjects, key=lambda procObj: procObj['vms'], reverse=True)
     return listOfProcObjects
+# print(getListOfProcessSortedByMemory())
+bigdict = getListOfProcessSortedByMemory()
 
-def processSize(vms):
-    return vms / screenX
 
-def getSizes():
-    listOfRunningProcess = getListOfProcessSortedByMemory()
-    adjustedSizes = []
-    sizes = []
-    numberOfAsteroids = 20
-    for elem in listOfRunningProcess[:numberOfAsteroids] :
-        print(elem['name'])
+
+duplicates = []
+newNames = []
+for i in bigdict:
+    if i['name'] not in duplicates: 
+        duplicates.append(i['name'])
+        newNames.append({'name':i['name'], 'size':0})
+    combinedSize = newNames[i['size'] + bigdict[i['vms']]]
+    newNames['name'].update(combinedSize)
+print(newNames)
+
+
+# duplicates = {'name':[]}
+# newNames = {'name':[], 'vms':[]}
+# for i in bigdict:
+#     if i['name'] not in duplicates['name']: 
+#         duplicates['name'].append(i['name'])
+#         newNames['name'].append(i['name'])
+#         newNames['vms'].append(i['vms'])
+# print(newNames)
+
+
+
+# newNames = []
+# newSizes = []
+# duplicates = []
+# print()
+# def deduplicate(list1):
+    
+#     i = 0
+#     while i <= len(list1)-1:
+#         if list1[i] not in duplicates:
+#             newNames.append(list1[i])
+#             newSizes.append(sizes[i])
+#             duplicates.append(list1[i])
+#         # elif i in duplicates:
+#         #     duplicates.append(i)
+#         i += 1
         
-        #print(elem['pid'])
-        adjustedSizes.append(processSize(elem['vms']))
 
-    difference = max(adjustedSizes) - min(adjustedSizes)
-    print(difference)
-    for i in adjustedSizes:
-        j = math.log2(i)
-        #j = (i / difference) * 100
-        sizes.append([j,j])
-    print(sizes)
-    print(adjustedSizes)
 
-getSizes()
+# deduplicate(list1)
