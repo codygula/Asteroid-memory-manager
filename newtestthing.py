@@ -59,20 +59,47 @@ class Asteroid():
         self.speed = "speed here"
         self.size = size
         font = pygame.font.SysFont(None, 16)
-        self.img = font.render(self.name, True, blue) 
-
+        self.img = font.render(self.name, True, white) 
 
         
     def display(self):  
         image = pygame.transform.scale(Asteroid.asteroidImg, self.size)  
         screen.blit(image, (self.asteroidX, self.asteroidY))
         screen.blit(self.img, (self.asteroidX, self.asteroidY))
-    
-    def move(self):
-        pass
 
-
-explosion = [pygame.image.load('numbers/one.png'), pygame.image.load('numbers/two.png'), pygame.image.load('numbers/three.png'), pygame.image.load('numbers/four.png'), pygame.image.load('numbers/five.png'), pygame.image.load('numbers/six.png')]
+class Explosion():
+    def __init__(self,explosionX,explosionY):
+        self.explosionX = explosionX
+        self.explosionY = explosionY
+        self.images = []
+        self.images.append(pygame.image.load('explosions/regularExplosion00.png'))
+        self.images.append(pygame.image.load('explosions/regularExplosion01.png'))
+        self.images.append(pygame.image.load('explosions/regularExplosion02.png'))
+        self.images.append(pygame.image.load('explosions/regularExplosion03.png'))
+        self.images.append(pygame.image.load('explosions/regularExplosion04.png'))
+        self.images.append(pygame.image.load('explosions/regularExplosion05.png'))
+        self.images.append(pygame.image.load('explosions/regularExplosion06.png'))
+        self.images.append(pygame.image.load('explosions/regularExplosion07.png'))
+        self.images.append(pygame.image.load('explosions/regularExplosion08.png'))
+ 
+        self.index = 0
+ 
+        self.image = self.images[self.index]
+ 
+        self.rect = pygame.Rect(5, 5, 150, 198)
+ 
+    def update(self): #, explosionX, explosionY):
+        i = 0
+        while i <= len(self.images):
+            screen.blit(self.image, (self.explosionX, self.explosionY))
+            print("EXPLOSION!")
+            self.index += 1
+            if self.index >= len(self.images):
+                self.index = 0
+            self.image = self.images[self.index]
+            i += 1
+        # screen.blit(self.image, (self.explosionX, self.explosionY))
+        # print("EXPLOSION!")
 
 
 startX = random.randint(5,790)
@@ -120,22 +147,35 @@ adjustedSizes = []
 #sizes = []
 numberOfAsteroids = 20
 for elem in listOfRunningProcess[:numberOfAsteroids]:
-    print(elem['name'])
     
-    #print(elem['pid'])
     adjustedSizes.append(processSize(elem['vms']))
     list1.append(elem['name'])
 
 difference = max(adjustedSizes) - min(adjustedSizes)
-print(difference)
+
 
 # Thing to determine size of asteroids. This needs work
 for i in adjustedSizes:
     j = math.log2(i) *  screenX /100#/ difference
     
     sizes.append([j,j])
-print(sizes)
-print(adjustedSizes)
+
+
+
+
+# Code to deduplicate processes and add together total memory
+# This should be between list1 and the create function.
+# It should take the elements in list one and return a deduplicated dictionary of processes and memory size.
+# def deduplicate(list1):
+#     newNames = []
+#     newSizes = []
+#     duplicates = []
+#     for i in list1:
+#         if i not in duplicates:
+            
+
+
+
 
 i = 0
 while i <= len(list1)-1:
@@ -146,10 +186,12 @@ while i <= len(list1)-1:
 # Main loop
 running = True
 while running:
-    clock.tick(30)
+    FPS = 30 # frames per second setting
+    fpsClock = pygame.time.Clock()
+
 
     # Background color
-    screen.fill((255,0,0))
+    screen.fill((0,0,0))
     changes = [1 , 3]
     negChanges = [-1 , -2]
 
@@ -176,13 +218,13 @@ while running:
         
         if isCollision(i.asteroidX, i.asteroidY, bulletX, bulletY) == True:
             print("Collision", i.name)
+            explode = Explosion(i.asteroidX, i.asteroidY)
+            explode.update()
+           
 
-            # slowed mode explode code
-            j=0
-            while j <= len(explosion)-1:
-                screen.blit(explosion[j], (i.asteroidX, i.asteroidY))
-                j += 1
             asteroids.remove(i)
+
+
 
         if i.asteroidX < 0:
             i.direction = "right"
@@ -200,7 +242,6 @@ while running:
             i.asteroidX += xchange
             i.display()
             
-
         if i.direction == "left":
             xchange = random.choice(negChanges)
             i.asteroidX += xchange 
@@ -238,6 +279,6 @@ while running:
         fire_bullet(bulletX, bulletY)
         bulletY -= bulletY_change
     
-    
+    fpsClock.tick(FPS)
     player(playerX, playerY)
     pygame.display.update()
