@@ -119,6 +119,9 @@ speed = []
 asteroids = []
 
 
+# TODO Simplify this part. Combine it with other code to iterate over listOfRunningProcess directly instead of 
+# the list1, newlist, newnumber nonsense. Make one single function that returns a list of up to 20 items along with their total size.
+# Maybe in a separate file?
 
 def getListOfProcessSortedByMemory():
     #Get list of running processes by memory
@@ -144,6 +147,8 @@ def processSize(vms):
 ## Code to create lists of runniung proccesses, thier sizes, and PIDs
 listOfRunningProcess = getListOfProcessSortedByMemory()
 adjustedSizes = []
+
+print("RUNNING!!!!!!!!!!!", listOfRunningProcess)
 #sizes = []
 numberOfAsteroids = 20
 for elem in listOfRunningProcess[:numberOfAsteroids]:
@@ -166,20 +171,30 @@ for i in adjustedSizes:
 # Code to deduplicate processes and add together total memory
 # This should be between list1 and the create function.
 # It should take the elements in list one and return a deduplicated dictionary of processes and memory size.
-# def deduplicate(list1):
-#     newNames = []
-#     newSizes = []
-#     duplicates = []
-#     for i in list1:
-#         if i not in duplicates:
-            
+#list1 = listOfRunningProcess
+newNames = []
+newSizes = []
+duplicates = []
+print(list1)
+def deduplicate(list1):
+    
+    i = 0
+    while i <= len(list1)-1:
+        if list1[i] not in duplicates:
+            newNames.append(list1[i])
+            newSizes.append(sizes[i])
+            duplicates.append(list1[i])
+        # elif i in duplicates:
+        #     duplicates.append(i)
+        i += 1
+        
 
 
-
+deduplicate(list1)
 
 i = 0
-while i <= len(list1)-1:
-    create(list1[i], sizes[i])
+while i <= len(newNames)-1:
+    create(newNames[i], newSizes[i])
     i += 1
 
 
