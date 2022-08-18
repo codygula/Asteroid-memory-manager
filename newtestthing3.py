@@ -2,9 +2,13 @@ import pygame
 import random
 import math
 import psutil
+import subprocess
 import os
 
 pygame.init()
+
+testMode = True
+
 screenX = 800
 screenY = 600
 
@@ -13,8 +17,17 @@ green = (0, 255, 0)
 blue = (0, 0, 128)
 black = (0,0,0)
 
+score = 0
+
 screen = pygame.display.set_mode((screenX,screenY))
 clock = pygame.time.Clock()
+
+# Display score and high score
+pygame.font.init() # you have to call this at the start, 
+                   # if you want to use this module.
+
+
+    
 
 
 playerImg = pygame.image.load("space-invaders.png")
@@ -47,9 +60,21 @@ def isCollision(enemyX, enemyY, bulletX, bulletY):
     else:
         return False
 
+def destroyed(name, size):
+    global score
+    score = score + size
+    print("killall ", name, size)
+    if testMode == False:
+        subprocess.run(f"killall -q -I {name}", shell=True)
+        print(f"killall -q -I {name}")
+    elif testMode == True:
+        print(f"TEST MODE killall {name}")
+
+
+
 class Asteroid():
     asteroidImg = pygame.image.load("asteroid.png")
-    def __init__(self, asteroidX, asteroidY, name, size):
+    def __init__(self, asteroidX, asteroidY, name, size, memory):
         self.asteroidX = asteroidX
         self.asteroidY = asteroidY
         self.direction = "left"
@@ -58,12 +83,19 @@ class Asteroid():
         self.name = name
         self.speed = "speed here"
         self.size = size
+        self.memory = memory
         font = pygame.font.SysFont(None, 16)
         self.img = font.render(self.name, True, white) 
 
         
     def display(self):  
-        image = pygame.transform.scale(Asteroid.asteroidImg, self.size)  
+        # image = pygame.transform.scale(Asteroid.asteroidImg, self.size)
+        try:
+            image = pygame.transform.scale(Asteroid.asteroidImg, self.size)  
+            print(self.size)
+        except:
+            image = pygame.transform.scale(Asteroid.asteroidImg, (25,25))
+            print("error", self.size)
         screen.blit(image, (self.asteroidX, self.asteroidY))
         screen.blit(self.img, (self.asteroidX, self.asteroidY))
 
@@ -100,8 +132,6 @@ class Explosion():
             i += 1
         # screen.blit(self.image, (self.explosionX, self.explosionY))
         # print("EXPLOSION!")
-
-
 
 
 ########################################
@@ -152,17 +182,16 @@ def getListOfProcessSortedByMemory():
 
 startX = random.randint(5,790)
 startY = random.randint(5, 590)
-list1 = []
-sizes = []
-speed = []
+asteroidNames = []
+asteroidSizes = []
 asteroids = [] # The list used in the main loop
 numberOfAsteroids = 20
-adjustedSizes = []
+preadjustedSizes = []
 
-def create(name, size):
+def create(name, size, memory):
         ax = random.randint(5,790)
         ay = random.randint(5, 590)
-        asteroids.append(Asteroid(ax,ay, name, size))
+        asteroids.append(Asteroid(ax,ay, name, size, memory))
 
 def processSize(vms):
     return vms / screenX
@@ -170,21 +199,21 @@ def processSize(vms):
 
 listOfRunningProcess = getListOfProcessSortedByMemory()
 
-for elem in listOfRunningProcess[:numberOfAsteroids]:
+for i in listOfRunningProcess[:numberOfAsteroids]:
     
-    adjustedSizes.append(processSize(elem['size']))
-    list1.append(elem['name'])
+    preadjustedSizes.append(processSize(i['size']))
+    asteroidNames.append(i['name'])
 
 # Thing to determine size of asteroids. This needs work
-for i in adjustedSizes:
-    j = math.log2(i) *  screenX /100#/ difference
+for i in preadjustedSizes:
+    j = abs(math.log2(i) *  screenX /100) #/ difference
     
-    sizes.append([j,j])
+    asteroidSizes.append([j,j])
 
 
 i = 0
-while i <= len(newNames)-1:
-    create(newNames[i], newSizes[i])
+while i <= len(asteroidNames)-1:
+    create(asteroidNames[i], asteroidSizes[i], preadjustedSizes[i])
     i += 1
 
 
@@ -200,12 +229,18 @@ running = True
 while running:
     FPS = 30 # frames per second setting
     fpsClock = pygame.time.Clock()
-
+    
 
     # Background color
     screen.fill((0,0,0))
     changes = [1 , 3]
     negChanges = [-1 , -2]
+
+    # Display score
+    my_font = pygame.font.SysFont('Courier', 30)
+    text_surface = my_font.render(f'SCORE: {score}', False, white)
+    screen.blit(text_surface, (0,0))
+    
 
     # keystroke control
     for event in pygame.event.get():
@@ -235,6 +270,11 @@ while running:
            
 
             asteroids.remove(i)
+            
+            destroyed(i.name, i.memory)
+            print("SIZE", i.memory)
+            print(type(i.size))
+            print("score = ", score)
 
 
 
