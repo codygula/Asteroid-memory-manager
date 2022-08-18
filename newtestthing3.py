@@ -7,7 +7,7 @@ import os
 
 pygame.init()
 
-testMode = True
+testMode = False
 
 screenX = 800
 screenY = 600
@@ -36,11 +36,11 @@ playerY = 480
 playerX_change = 0
 
 # Bullet
-bulletImg = pygame.image.load("circle.png")
+bulletImg = pygame.image.load("square.png")
 bulletX = 0
 bulletY = 480
 bulletX_change = 0.5
-bulletY_change = 10
+bulletY_change = 40
 bullet_state = "ready"
 
 def player(x,y):
@@ -51,7 +51,7 @@ def player(x,y):
 def fire_bullet(x,y):
     global bullet_state
     bullet_state = "fire"
-    screen.blit(bulletImg,(x + 16 , y + 10))
+    screen.blit(bulletImg,(x + 30 , y + 10))
 
 def isCollision(enemyX, enemyY, bulletX, bulletY):
     distance = math.sqrt(math.pow(enemyX - bulletX , 2) + math.pow(enemyY - bulletY , 2))
@@ -92,12 +92,12 @@ class Asteroid():
         # image = pygame.transform.scale(Asteroid.asteroidImg, self.size)
         try:
             image = pygame.transform.scale(Asteroid.asteroidImg, self.size)  
-            print(self.size)
+            
         except:
             image = pygame.transform.scale(Asteroid.asteroidImg, (25,25))
-            print("error", self.size)
+            print("error", self.name, self.size)
         screen.blit(image, (self.asteroidX, self.asteroidY))
-        screen.blit(self.img, (self.asteroidX, self.asteroidY))
+        screen.blit(self.img, (self.asteroidX + self.size[0], self.asteroidY+ (self.size[1]/10)))
 
 class Explosion():
     def __init__(self,explosionX,explosionY):
@@ -120,18 +120,17 @@ class Explosion():
  
         self.rect = pygame.Rect(5, 5, 150, 198)
  
-    def update(self): #, explosionX, explosionY):
+    def update(self): 
         i = 0
         while i <= len(self.images):
-            screen.blit(self.image, (self.explosionX, self.explosionY))
+            screen.blit(self.image, (self.explosionX - 35, self.explosionY - 35))
             print("EXPLOSION!")
             self.index += 1
             if self.index >= len(self.images):
                 self.index = 0
             self.image = self.images[self.index]
             i += 1
-        # screen.blit(self.image, (self.explosionX, self.explosionY))
-        # print("EXPLOSION!")
+        
 
 
 ########################################
@@ -142,18 +141,20 @@ def getListOfProcessSortedByMemory():
     It is sorted largest to smallest. It deduplicates the items on the list, but it does not 
     yet combine total memory sizes. It just returns the memory usage of the first instance of
     an item on a list.'''
-    #Get list of running processes by memory
+    # Get list of running processes by memory
     listOfProcObjects = []
-    # Iterate over the list
+    
     for proc in psutil.process_iter():
        try:
            # Fetch process details as dict
            pinfo = proc.as_dict(attrs=['pid', 'name', 'username'])
            pinfo['vms'] = proc.memory_info().vms / (1024 * 1024)
+
            # Append dict to list
            listOfProcObjects.append(pinfo);
        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
            pass
+
     # Sort list of dict by key vms i.e. memory usage
     bigdict = sorted(listOfProcObjects, key=lambda procObj: procObj['vms'], reverse=True)
     duplicates = []
@@ -165,13 +166,13 @@ def getListOfProcessSortedByMemory():
             #newNames.append({'name':bigdict[i]['name'], 'size':0})
             combinedSize = bigdict[i]['vms'] #newNames[i]['size'] #+ bigdict[i]['vms']
             #newNames.append({'name':bigdict[i]['name'], 'size':combinedSize}) # Update here
-            print("!!!!!!!!!!!!!!!!!! DUPLICATE")
+            #print("!!!!!!!!!!!!!!!!!! DUPLICATE")
 
         elif bigdict[i]['name'] not in duplicates:
             duplicates.append(bigdict[i]['name'])
             combinedSize = bigdict[i]['vms']
             newNames.append({'name':bigdict[i]['name'], 'size':combinedSize})
-            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ORIGIONAL")
+            #print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ORIGIONAL")
     
         i += 1
     return newNames
@@ -217,20 +218,12 @@ while i <= len(asteroidNames)-1:
     i += 1
 
 
-
-
-
-
-
-
-
 # Main loop
 running = True
 while running:
     FPS = 30 # frames per second setting
     fpsClock = pygame.time.Clock()
     
-
     # Background color
     screen.fill((0,0,0))
     changes = [1 , 3]
@@ -241,7 +234,6 @@ while running:
     text_surface = my_font.render(f'SCORE: {score}', False, white)
     screen.blit(text_surface, (0,0))
     
-
     # keystroke control
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -285,7 +277,7 @@ while running:
 
         if i.asteroidY < 0:
             i.Ydirection = "up"
-        elif i.asteroidY > 475:
+        elif i.asteroidY > 435:
             i.Ydirection = "down"
         
         
