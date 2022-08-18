@@ -6,8 +6,18 @@ import subprocess
 import os
 
 pygame.init()
+pygame.display.set_caption('Linux Memory Use Utility')
 
-testMode = False
+# TODO  1. Fix explosion sequence.
+#       2. Create new black and white assets (ship and explosions)
+#       3. Add high score create/read from log file.
+#       4. Add gradually fading text saying "killall " + name to explosion
+#       5. Fix asteroid size issue
+#       6. Improve asteroid bouncing 
+#       7. Make deduplicating function add up total memory use instead of just first item memory use.
+
+# Changing this to False will cause it to killall in real life. True just prints to screen.
+testMode = True
 
 screenX = 800
 screenY = 600
@@ -23,12 +33,7 @@ screen = pygame.display.set_mode((screenX,screenY))
 clock = pygame.time.Clock()
 
 # Display score and high score
-pygame.font.init() # you have to call this at the start, 
-                   # if you want to use this module.
-
-
-    
-
+pygame.font.init() 
 
 playerImg = pygame.image.load("space-invaders.png")
 playerX = 370
@@ -45,8 +50,6 @@ bullet_state = "ready"
 
 def player(x,y):
     screen.blit(playerImg, (x,y))
-
-
 
 def fire_bullet(x,y):
     global bullet_state
@@ -68,9 +71,7 @@ def destroyed(name, size):
         subprocess.run(f"killall -q -I {name}", shell=True)
         print(f"killall -q -I {name}")
     elif testMode == True:
-        print(f"TEST MODE killall {name}")
-
-
+        print(f"TEST MODE:~$ killall -q -I {name}")
 
 class Asteroid():
     asteroidImg = pygame.image.load("asteroid.png")
@@ -86,10 +87,8 @@ class Asteroid():
         self.memory = memory
         font = pygame.font.SysFont(None, 16)
         self.img = font.render(self.name, True, white) 
-
         
     def display(self):  
-        # image = pygame.transform.scale(Asteroid.asteroidImg, self.size)
         try:
             image = pygame.transform.scale(Asteroid.asteroidImg, self.size)  
             
@@ -176,10 +175,6 @@ def getListOfProcessSortedByMemory():
     
         i += 1
     return newNames
-
-
-
-
 
 startX = random.randint(5,790)
 startY = random.randint(5, 590)
